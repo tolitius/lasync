@@ -1,13 +1,13 @@
 # Limited Async
 
-An executor service (a.k.a. smart pool of threads) that is backed by a LimitedQueue.
+An executor service (a.k.a. smart pool of threads) that is backed by a [LimitedQueue](https://github.com/tolitius/lasync/blob/master/src/java/LimitedQueue.java).
 
 The purpose of this tiny library is to be able to block on ".submit" whenever the q task limit is reached. Here is why..
 
 ## Why
 
 If a regular [BlockingQueue](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html) is used, 
-a ThreadPoolExecutor calls queue's "[offer](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html#offer(E))"
+a ThreadPoolExecutor calls queue's "[offer](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html#offer\(E\))"
 method which does not block: inserts the task and returns true, or returns false in case a queue is "capacity-restricted" and its capacity was reached.
 
 While this behaviour is useful, there are cases where we do need to _block_ and wait until a ThreadPoolExecutor has 
@@ -60,7 +60,9 @@ lein repl
 
 ```clojure
 user=> (use 'lasync.show)
+```
 
+```clojure
 user=> (rock-on 69)  ;; Woodstock'69
 ```
 
@@ -89,6 +91,9 @@ Here lasync show was rocking on 4 core box (which it picked up on), so regardles
 the queue max size always stays at 4, and lasync creates that back pressure in case the task q limit is reached. 
 In fact the "blocking" can be seen in action, as each task is sleeping for a second, 
 so the whole thing can be visually seen being processed by 4, pause, next 4, pause, etc..
+
+Here is [the code](https://github.com/tolitius/lasync/blob/master/src/lasync/show.clj) behind the show
+
 
 ## License
 
