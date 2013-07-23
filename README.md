@@ -17,6 +17,12 @@ Another good use is described in ["Creating a NotifyingBlockingThreadPoolExecuto
 
 ## How To
 
+To get lasync with Leinigen:
+
+```clojure
+[lasync "0.1.0-SNAPSHOT"]
+```
+
 To create a pool with limited number of threads and a backing q limit:
 
 ```clojure
