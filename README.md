@@ -22,7 +22,7 @@ Another good use is described in ["Creating a NotifyingBlockingThreadPoolExecuto
 To get lasync with Leiningen:
 
 ```clojure
-[lasync "0.1.0"]
+[lasync "0.1.1"]
 ```
 
 ### Use it
