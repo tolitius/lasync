@@ -1,21 +1,31 @@
 # Limited Async
 
-An executor service (a.k.a. smart pool of threads) that is backed by a LimitedQueue.
+An executor service (a.k.a. smart pool of threads) that is backed by a [LimitedQueue](https://github.com/tolitius/lasync/blob/master/src/java/LimitedQueue.java).
 
 The purpose of this tiny library is to be able to block on ".submit" whenever the q task limit is reached. Here is why..
 
 ## Why
 
 If a regular [BlockingQueue](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html) is used, 
-a ThreadPoolExecutor calls queue's "[offer](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html#offer(E))"
+a ThreadPoolExecutor calls queue's "[offer](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html#offer\(E\))"
 method which does not block: inserts the task and returns true, or returns false in case a queue is "capacity-restricted" and its capacity was reached.
 
-While this behaviour is useful, there are cases where we do need to _block_ and wait until a ThreadPoolExecutor has 
+While this behavior is useful, there are cases where we do need to _block_ and wait until a ThreadPoolExecutor has 
 a thread available to work on the task. One reason could be an off heap storage that is being read and processed by a ThreadPoolExecutor:
 e.g. there is no need, and sometimes completely undesired, to use JVM heap for something that is already available off heap.
 Another good use is described in ["Creating a NotifyingBlockingThreadPoolExecutor"](https://today.java.net/pub/a/today/2008/10/23/creating-a-notifying-blocking-thread-pool-executor.html).
 
 ## How To
+
+### Get it
+
+To get lasync with Leiningen:
+
+```clojure
+[lasync "0.1.0-SNAPSHOT"]
+```
+
+### Use it
 
 To create a pool with limited number of threads and a backing q limit:
 
@@ -60,7 +70,9 @@ lein repl
 
 ```clojure
 user=> (use 'lasync.show)
+```
 
+```clojure
 user=> (rock-on 69)  ;; Woodstock'69
 ```
 
@@ -89,6 +101,9 @@ Here lasync show was rocking on 4 core box (which it picked up on), so regardles
 the queue max size always stays at 4, and lasync creates that back pressure in case the task q limit is reached. 
 In fact the "blocking" can be seen in action, as each task is sleeping for a second, 
 so the whole thing can be visually seen being processed by 4, pause, next 4, pause, etc..
+
+Here is [the code](https://github.com/tolitius/lasync/blob/master/src/lasync/show.clj) behind the show
+
 
 ## License
 
