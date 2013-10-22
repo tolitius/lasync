@@ -8,7 +8,7 @@ The purpose of this tiny library is to be able to block on ".submit" whenever th
 
 If a regular [BlockingQueue](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html) is used, 
 a ThreadPoolExecutor calls queue's "[offer](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html#offer\(E\))"
-method which does not block: inserts the task and returns true, or returns false in case a queue is "capacity-restricted" and its capacity was reached.
+method which does not block: inserts a task and returns true, or returns false in case a queue is "capacity-restricted" and its capacity was reached.
 
 While this behavior is useful, there are cases where we do need to _block_ and wait until a ThreadPoolExecutor has 
 a thread available to work on the task. One reason could be an off heap storage that is being read and processed by a ThreadPoolExecutor:
