@@ -10,7 +10,8 @@
   :scm {:name "git"
         :url "https://github.com/tolitius/lasync"}
 
-  :profiles {:dev {:repl-options {:init-ns lasync.core}}}
+  :profiles {:dev {:source-paths ["dev"]
+                   :repl-options {:init-ns show}}}
 
   :dependencies [[org.clojure/tools.logging "0.3.1"]
                  [org.clojure/clojure "1.5.1"]])
