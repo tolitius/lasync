@@ -1,6 +1,6 @@
 # Limited Async
 
-An executor service (a.k.a. smart pool of threads) that is backed by a [LimitedQueue](https://github.com/tolitius/lasync/blob/master/src/java/LimitedQueue.java).
+An executor service (a.k.a. smart pool of threads) that is backed by a [ArrayLimitedQueue](src/java/lasync/limitq/ArrayLimitedQueue.java) or [LinkedLimitedQueue](src/java/lasync/limitq/LinkedLimitedQueue.java).
 
 The purpose of this tiny library is to be able to block on ".submit" whenever the q task limit is reached. Here is why..
 
@@ -31,7 +31,7 @@ To create a pool with limited number of threads and a backing q limit:
 
 ```clojure
 (ns sample.project
-  (:use lasync))
+  (:use lasync.core))
 
 (def pool (limit-pool))
 ```
@@ -102,7 +102,7 @@ the queue max size always stays at 4, and lasync creates that back pressure in c
 In fact the "blocking" can be seen in action, as each task is sleeping for a second, 
 so the whole thing can be visually seen being processed by 4, pause, next 4, pause, etc..
 
-Here is [the code](https://github.com/tolitius/lasync/blob/master/src/lasync/show.clj) behind the show
+Here is [the code](dev/show.clj) behind the show
 
 
 ## License
