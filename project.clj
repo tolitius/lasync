@@ -12,5 +12,5 @@
 
   :profiles {:dev {:repl-options {:init-ns lasync.core}}}
 
-  :dependencies [[org.clojure/tools.logging "0.2.6"]
+  :dependencies [[org.clojure/tools.logging "0.3.1"]
                  [org.clojure/clojure "1.5.1"]])
