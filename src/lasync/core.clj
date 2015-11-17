@@ -1,4 +1,4 @@
-(ns lasync
+(ns lasync.core
   (:import [limitq LimitedQueue]
            [java.util.concurrent ThreadPoolExecutor TimeUnit]))
 
