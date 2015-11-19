@@ -4,11 +4,14 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :source-paths ["src" "src/lasync"]
+  :source-paths ["src"]
   :java-source-paths ["src/java"]          
 
   :scm {:name "git"
         :url "https://github.com/tolitius/lasync"}
 
-  :dependencies [[org.clojure/tools.logging "0.2.6"]
+  :profiles {:dev {:source-paths ["dev"]
+                   :repl-options {:init-ns show}}}
+
+  :dependencies [[org.clojure/tools.logging "0.3.1"]
                  [org.clojure/clojure "1.5.1"]])
