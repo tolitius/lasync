@@ -104,6 +104,53 @@ so the whole thing can be visually seen being processed by 4, pause, next 4, pau
 
 Here is [the code](dev/show.clj) behind the show
 
+## Tweaking the knobs
+
+By default the limited blocking queue is ArrayLimitedQueue with 1024 element capacity, here's how to customize it
+
+```clojure
+(def lp (limit-pool :nthreads 1 :queue-size 128))
+```
+
+What if you want to use your own queue? No problem!
+
+```clojure
+(def lp (limit-pool :nthreads 1 :queue (LinkedLimitedQueue. 128)))
+```
+
+By default lasync's thread factory tries to have reasonable defaults but if you want to make your it's simply a matter
+of reify'ing an interface.
+
+```clojure
+(def tpool (reify ThreadFactory
+                 (newThread [_ runnable] ...)))
+
+(def lp (limit-pool :nthreads 10 :thread-factory tpool))
+```
+
+Custom 'RejectedExecutionHandler' is equally as simple
+
+```clojure
+
+(def reh (reify RejectedExecutionHandler
+             (rejectedExecution [_ runnable executor] ...)))
+
+(def lp (limit-pool :nthreads 10 :rejected-handler reh))
+```
+
+Customize everything!
+
+```clojure
+(def n ...)
+
+(def tpool (reify ThreadFactory
+                 (newThread [_ runnable] ...)))
+
+(def reh (reify RejectedExecutionHandler
+             (rejectedExecution [_ runnable executor] ...)))
+
+(def lp (limit-pool :nthreads n :thread-factory tpool :queue-size 2000 :rejected-handler reh))
+```
 
 ## License
 
