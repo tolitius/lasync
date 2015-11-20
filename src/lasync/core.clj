@@ -7,6 +7,9 @@
 (defonce available-cores 
   (.. Runtime getRuntime availableProcessors))
 
+(defn- default-num-threads []
+  (* 2 available-cores))
+
 (defn- thread-exception-handler []
   (reify Thread$UncaughtExceptionHandler
     (uncaughtException [_ thread throwable]
@@ -33,10 +36,12 @@
             (.setDaemon true)
             (.setUncaughtExceptionHandler ueh)))))))
 
-(defn limit-pool [& {:keys [nthreads queue thread-factory rejected-handler]
-                     :or {nthreads available-cores rejected-handler (rejected-exec-handler)
-                          queue (ArrayLimitedQueue. 128)
+(defn limit-pool [& {:keys [nthreads queue-size thread-factory rejected-handler queue]
+                     :or {nthreads (default-num-threads)
+                          queue-size 1024
+                          rejected-handler (rejected-exec-handler)
                           thread-factory (thread-factory "lasync-thread")}}]
-  (ThreadPoolExecutor. nthreads nthreads 1 TimeUnit/MILLISECONDS
-                       queue thread-factory rejected-handler))
 
+  (let [queue (or queue (ArrayLimitedQueue. queue-size))]
+    (ThreadPoolExecutor. nthreads nthreads 1 TimeUnit/MILLISECONDS
+                         queue thread-factory rejected-handler)))
