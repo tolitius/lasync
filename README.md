@@ -21,9 +21,7 @@ Another good use is described in ["Creating a NotifyingBlockingThreadPoolExecuto
 
 To get lasync with Leiningen:
 
-```clojure
-[lasync "0.1.1"]
-```
+[![Clojars Project](http://clojars.org/lasync/latest-version.svg)](http://clojars.org/lasync)
 
 ### Use it
 
@@ -31,7 +29,7 @@ To create a pool with limited number of threads and a backing q limit:
 
 ```clojure
 (ns sample.project
-  (:use lasync.core))
+  (:require [lasync.core :refer [limit-pool]]))
 
 (def pool (limit-pool))
 ```
@@ -42,11 +40,10 @@ That is pretty much it. The pool is a regular [ExecutorService](http://docs.orac
 (.submit pool #(+ 41 1))
 ```
 
-By default lasync will create a number of threads and a blocking queue limit that matches the number of available cores:
+By default lasync will create a number of threads and a blocking queue limit that doubles the number of available cores:
 
 ```clojure
-(defonce available-cores 
-  (.. Runtime getRuntime availableProcessors))
+(* 2 available-cores)
 ```
 
 But the number can be changed by:
@@ -69,7 +66,7 @@ lein repl
 ```
 
 ```clojure
-user=> (use 'lasync.show)
+user=> (require '[show :refer [rock-on]])
 ```
 
 ```clojure
@@ -106,17 +103,23 @@ Here is [the code](dev/show.clj) behind the show
 
 ## Tweaking the knobs
 
-By default the limited blocking queue is ArrayLimitedQueue with 1024 element capacity, here's how to customize it
+#### Queue size
+
+The default queue that is backing lasync's pool is `ArrayLimitedQueue` with a default capacity of `1024` items. But all defaults are there to customize. Use `:queue-size` to tune that knob:
 
 ```clojure
-(def lp (limit-pool :nthreads 1 :queue-size 128))
+(def pool (limit-pool :queue-size 65535))
 ```
 
-What if you want to use your own queue? No problem!
+#### Queue implementation
+
+While `ArrayLimitedQueue` fits most of the use cases, a custom, or a different queue can be configured via `:queue`:
 
 ```clojure
-(def lp (limit-pool :nthreads 1 :queue (LinkedLimitedQueue. 128)))
+(def pool (limit-pool :queue (LinkedLimitedQueue. 128)))
 ```
+
+#### Thread factory
 
 By default lasync's thread factory tries to have reasonable defaults but if you want to make your it's simply a matter
 of reify'ing an interface.
@@ -125,8 +128,10 @@ of reify'ing an interface.
 (def tpool (reify ThreadFactory
                  (newThread [_ runnable] ...)))
 
-(def lp (limit-pool :nthreads 10 :thread-factory tpool))
+(def pool (limit-pool :nthreads 10 :thread-factory tpool))
 ```
+
+#### Rejected execution handler
 
 Custom 'RejectedExecutionHandler' is equally as simple
 
@@ -135,21 +140,22 @@ Custom 'RejectedExecutionHandler' is equally as simple
 (def reh (reify RejectedExecutionHandler
              (rejectedExecution [_ runnable executor] ...)))
 
-(def lp (limit-pool :nthreads 10 :rejected-handler reh))
+(def pool (limit-pool :nthreads 10 :rejected-handler reh))
 ```
 
-Customize everything!
+#### UnDefault It
 
 ```clojure
-(def n ...)
-
 (def tpool (reify ThreadFactory
                  (newThread [_ runnable] ...)))
 
 (def reh (reify RejectedExecutionHandler
              (rejectedExecution [_ runnable executor] ...)))
 
-(def lp (limit-pool :nthreads n :thread-factory tpool :queue-size 2000 :rejected-handler reh))
+(def lp (limit-pool :nthreads 42 
+                    :thread-factory tpool 
+                    :queue-size 101010101 
+                    :rejected-handler reh))
 ```
 
 ## License
