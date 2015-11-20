@@ -1,4 +1,4 @@
-(defproject lasync "0.1.2-SNAPSHOT"
+(defproject lasync "0.1.3-SNAPSHOT"
   :description "executor service that blocks on .submit after the task queue limit is reached"
   :url "https://github.com/tolitius/lasync"
   :license {:name "Eclipse Public License"
