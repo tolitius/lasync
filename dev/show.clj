@@ -1,8 +1,9 @@
 (ns show
   (:require [lasync.core :refer :all]
-            [clojure.tools.logging :refer [info]]))
+            [clojure.tools.logging :refer [info]])
+  (:import [lasync.limitq ArrayLimitedQueue LinkedLimitedQueue]))
 
-(defonce pool (limit-pool))
+(defonce pool (limit-pool :queue (ArrayLimitedQueue. 4)))
 
 (defn qsize [pool]
   (.. pool getQueue size))
