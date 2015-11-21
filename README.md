@@ -11,8 +11,10 @@ a ThreadPoolExecutor calls queue's "[offer](http://docs.oracle.com/javase/7/docs
 method which does not block: inserts a task and returns true, or returns false in case a queue is "capacity-restricted" and its capacity was reached.
 
 While this behavior is useful, there are cases where we do need to _block_ and wait until a ThreadPoolExecutor has 
-a thread available to work on the task. One reason could be an off heap storage that is being read and processed by a ThreadPoolExecutor:
-e.g. there is no need, and sometimes completely undesired, to use JVM heap for something that is already available off heap.
+a thread available to work on the task.
+
+Depending on a use case this back pressure can be very useful. One reason could be an off heap storage that is being read and processed 
+by a ThreadPoolExecutor: e.g. there is no need, and sometimes completely undesired, to use JVM heap for something that is already available off heap.
 Another good use is described in ["Creating a NotifyingBlockingThreadPoolExecutor"](https://today.java.net/pub/a/today/2008/10/23/creating-a-notifying-blocking-thread-pool-executor.html).
 
 ## How To
@@ -49,11 +51,11 @@ By default lasync will create a number of threads and a blocking queue limit tha
 But the number can be changed by:
 
 ```clojure
-user=> (def pool (limit-pool :nthreads 42))
+user=> (def pool (limit-pool :threads 42))
 #'user/pool
 user=> (def pool (limit-pool :limit 42))
 #'user/pool
-user=> (def pool (limit-pool :nthreads 42 :limit 42))
+user=> (def pool (limit-pool :threads 42 :limit 42))
 #'user/pool
 ```
 
@@ -105,10 +107,11 @@ Here is [the code](dev/show.clj) behind the show
 
 #### Queue size
 
-The default queue that is backing lasync's pool is `ArrayLimitedQueue` with a default capacity of `1024` items. But all defaults are there to customize. Use `:queue-size` to tune that knob:
+The default queue that is backing lasync's pool is `ArrayLimitedQueue` with a default capacity of `1024` items. But all defaults are there to customize.
+A queue size is what limits the pool enabling the back pressure. Use `:limit` to tune that knob:
 
 ```clojure
-(def pool (limit-pool :queue-size 65535))
+(def pool (limit-pool :limit 65535))
 ```
 
 #### Queue implementation
@@ -128,7 +131,7 @@ of reify'ing an interface.
 (def tpool (reify ThreadFactory
                  (newThread [_ runnable] ...)))
 
-(def pool (limit-pool :nthreads 10 :thread-factory tpool))
+(def pool (limit-pool :threads 10 :thread-factory tpool))
 ```
 
 #### Rejected execution handler
@@ -140,7 +143,7 @@ Custom 'RejectedExecutionHandler' is equally as simple
 (def reh (reify RejectedExecutionHandler
              (rejectedExecution [_ runnable executor] ...)))
 
-(def pool (limit-pool :nthreads 10 :rejected-handler reh))
+(def pool (limit-pool :threads 10 :rejected-handler reh))
 ```
 
 #### UnDefault It
@@ -152,9 +155,9 @@ Custom 'RejectedExecutionHandler' is equally as simple
 (def reh (reify RejectedExecutionHandler
              (rejectedExecution [_ runnable executor] ...)))
 
-(def lp (limit-pool :nthreads 42 
+(def lp (limit-pool :threads 42 
                     :thread-factory tpool 
-                    :queue-size 101010101 
+                    :limit 101010101 
                     :rejected-handler reh))
 ```
 

@@ -13,13 +13,13 @@
 (defn- thread-exception-handler []
   (reify Thread$UncaughtExceptionHandler
     (uncaughtException [_ thread throwable]
-      (error "Problem occured in " (.getName thread) throwable))))
+      (error (str "problem detected in thread: [" (.getName thread) "]") throwable))))
 
 (defn- rejected-exec-handler
   ([]
    (reify RejectedExecutionHandler
      (rejectedExecution [_ runnable executor]
-       (error "Rejected exec" runnable))))
+       (error "rejected execution: " runnable))))
   ([f]
    (reify RejectedExecutionHandler
      (rejectedExecution [_ runnable executor]
@@ -36,12 +36,12 @@
             (.setDaemon true)
             (.setUncaughtExceptionHandler ueh)))))))
 
-(defn limit-pool [& {:keys [nthreads queue-size thread-factory rejected-handler queue]
-                     :or {nthreads (default-num-threads)
-                          queue-size 1024
+(defn limit-pool [& {:keys [threads limit thread-factory rejected-handler queue]
+                     :or {threads (default-num-threads)
+                          limit 1024
                           rejected-handler (rejected-exec-handler)
                           thread-factory (thread-factory "lasync-thread")}}]
 
-  (let [queue (or queue (ArrayLimitedQueue. queue-size))]
-    (ThreadPoolExecutor. nthreads nthreads 1 TimeUnit/MILLISECONDS
+  (let [queue (or queue (ArrayLimitedQueue. limit))]
+    (ThreadPoolExecutor. threads threads 1 TimeUnit/MILLISECONDS
                          queue thread-factory rejected-handler)))

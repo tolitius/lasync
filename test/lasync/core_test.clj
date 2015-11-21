@@ -5,10 +5,10 @@
 
 (deftest sanity-test
   (testing "checking sanity like size + state"
-    (let [nthreads 3
-          pool (limit-pool :nthreads nthreads)]
+    (let [threads 3
+          pool (limit-pool :threads threads)]
 
-      (is (= nthreads (.getCorePoolSize pool)))
+      (is (= threads (.getCorePoolSize pool)))
       (is (instance? ArrayLimitedQueue (.getQueue pool)))
       (is (false? (.isShutdown pool)))
       (is (false? (.isTerminated pool))))))
@@ -16,14 +16,14 @@
 (deftest queue-test
   (testing "check queue injection"
     (let [capacity 11
-          pool (limit-pool :nthreads 1 :queue (LinkedLimitedQueue. capacity))]
+          pool (limit-pool :threads 1 :queue (LinkedLimitedQueue. capacity))]
       (is (instance? LinkedLimitedQueue (.getQueue pool)))
       (is (= capacity (.remainingCapacity (.getQueue pool)))))))
 
 (deftest queue-array-test
   (testing "check array blocking queue"
     (let [capacity 11
-          pool (limit-pool :nthreads 1 :queue (ArrayLimitedQueue. capacity))]
+          pool (limit-pool :threads 1 :queue (ArrayLimitedQueue. capacity))]
       (is (instance? ArrayLimitedQueue (.getQueue pool)))
       (is (= capacity (.remainingCapacity (.getQueue pool)))))))
 
