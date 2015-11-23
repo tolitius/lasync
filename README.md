@@ -31,9 +31,9 @@ To create a pool with limited number of threads and a backing q limit:
 
 ```clojure
 (ns sample.project
-  (:require [lasync.core :refer [limit-pool]]))
+  (:require [lasync.core :as lasync]))
 
-(def pool (limit-pool))
+(def pool (lasync/pool))
 ```
 
 That is pretty much it. The pool is a regular [ExecutorService](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/ExecutorService.html) that can have tasks submitted to it:
@@ -41,6 +41,14 @@ That is pretty much it. The pool is a regular [ExecutorService](http://docs.orac
 ```clojure
 (.submit pool #(+ 41 1))
 ```
+
+there is also a submit fn that wraps this call and returns a future:
+
+```clojure
+show=> (lasync/submit pool #(+ 41 1))
+#object[java.util.concurrent.FutureTask 0x6d1ce6d3 "java.util.concurrent.FutureTask@6d1ce6d3"]
+```
+
 
 By default lasync will create a number of threads and a blocking queue limit that doubles the number of available cores:
 
@@ -51,11 +59,11 @@ By default lasync will create a number of threads and a blocking queue limit tha
 But the number can be changed by:
 
 ```clojure
-user=> (def pool (limit-pool :threads 42))
+user=> (def pool (lasync/pool :threads 42))
 #'user/pool
-user=> (def pool (limit-pool :limit 42))
+user=> (def pool (lasync/pool :limit 42))
 #'user/pool
-user=> (def pool (limit-pool :threads 42 :limit 42))
+user=> (def pool (lasync/pool :threads 42 :limit 42))
 #'user/pool
 ```
 
@@ -111,7 +119,7 @@ The default queue that is backing lasync's pool is `ArrayLimitedQueue` with a de
 A queue size is what limits the pool enabling the back pressure. Use `:limit` to tune that knob:
 
 ```clojure
-(def pool (limit-pool :limit 65535))
+(def pool (lasync/pool :limit 65535))
 ```
 
 #### Queue implementation
@@ -119,7 +127,7 @@ A queue size is what limits the pool enabling the back pressure. Use `:limit` to
 While `ArrayLimitedQueue` fits most of the use cases, a custom, or a different queue can be configured via `:queue`:
 
 ```clojure
-(def pool (limit-pool :queue (LinkedLimitedQueue. 128)))
+(def pool (lasync/pool :queue (LinkedLimitedQueue. 128)))
 ```
 
 #### Thread factory
@@ -131,7 +139,7 @@ of reify'ing an interface.
 (def tpool (reify ThreadFactory
                  (newThread [_ runnable] ...)))
 
-(def pool (limit-pool :threads 10 :thread-factory tpool))
+(def pool (lasync/pool :threads 10 :thread-factory tpool))
 ```
 
 #### Rejected execution handler
@@ -143,7 +151,7 @@ Custom 'RejectedExecutionHandler' is equally as simple
 (def reh (reify RejectedExecutionHandler
              (rejectedExecution [_ runnable executor] ...)))
 
-(def pool (limit-pool :threads 10 :rejected-handler reh))
+(def pool (lasync/pool :threads 10 :rejected-handler reh))
 ```
 
 #### UnDefault It
@@ -155,10 +163,10 @@ Custom 'RejectedExecutionHandler' is equally as simple
 (def reh (reify RejectedExecutionHandler
              (rejectedExecution [_ runnable executor] ...)))
 
-(def lp (limit-pool :threads 42 
-                    :thread-factory tpool 
-                    :limit 101010101 
-                    :rejected-handler reh))
+(def lp (lasync/pool :threads 42 
+                     :thread-factory tpool 
+                     :limit 101010101 
+                     :rejected-handler reh))
 ```
 
 ## License
