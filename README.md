@@ -136,8 +136,9 @@ By default lasync's thread factory tries to have reasonable defaults but if you 
 of reify'ing an interface.
 
 ```clojure
-(def tpool (reify ThreadFactory
-                 (newThread [_ runnable] ...)))
+(def tpool (reify 
+             ThreadFactory
+             (newThread [_ runnable] ...)))
 
 (def pool (lasync/pool :threads 10 :thread-factory tpool))
 ```
@@ -148,8 +149,9 @@ Custom 'RejectedExecutionHandler' is equally as simple
 
 ```clojure
 
-(def reh (reify RejectedExecutionHandler
-             (rejectedExecution [_ runnable executor] ...)))
+(def reh (reify 
+           RejectedExecutionHandler
+           (rejectedExecution [_ runnable executor] ...)))
 
 (def pool (lasync/pool :threads 10 :rejected-handler reh))
 ```
