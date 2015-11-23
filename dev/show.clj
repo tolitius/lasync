@@ -1,9 +1,9 @@
 (ns show
-  (:require [lasync.core :refer :all]
+  (:require [lasync.core :as lasync]
             [clojure.tools.logging :refer [info]])
   (:import [lasync.limitq ArrayLimitedQueue LinkedLimitedQueue]))
 
-(defonce pool (limit-pool :queue (ArrayLimitedQueue. 4)))
+(defonce pool (lasync/pool :queue (ArrayLimitedQueue. 42)))
 
 (defn qsize [pool]
   (.. pool getQueue size))
@@ -14,5 +14,5 @@
 
 (defn rock-on [ntasks]
   (map (fn [n]
-         (.submit pool #(stats pool n)))
+         (lasync/submit pool #(stats pool n)))
        (range ntasks)))
