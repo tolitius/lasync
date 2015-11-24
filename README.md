@@ -42,12 +42,14 @@ That is pretty much it. The pool is a regular [ExecutorService](http://docs.orac
 (.submit pool #(+ 41 1))
 ```
 
-there is also a submit fn that wraps this call and returns a future:
+there is also a `submit` function that wraps this call and returns a future:
 
 ```clojure
 show=> (lasync/submit pool #(+ 41 1))
 #object[java.util.concurrent.FutureTask 0x6d1ce6d3 "java.util.concurrent.FutureTask@6d1ce6d3"]
 ```
+
+### Number of threads
 
 By default lasync will create `available cores * 2 + 42` number of threads:
 
@@ -61,10 +63,15 @@ But the number can be changed by:
 ```clojure
 user=> (def pool (lasync/pool :threads 42))
 #'user/pool
-user=> (def pool (lasync/pool :limit 42))
-#'user/pool
-user=> (def pool (lasync/pool :threads 42 :limit 42))
-#'user/pool
+```
+
+### Queue size
+
+The default queue that is backing lasync's pool is `ArrayLimitedQueue` with a default capacity of `1024` items. But all defaults are there to customize.
+A queue size is what limits the pool _enabling the back pressure_. Use `:limit` to tune that knob:
+
+```clojure
+(def pool (lasync/pool :limit 65535))
 ```
 
 ## Show Me
@@ -111,16 +118,7 @@ so the whole thing can be visually seen being processed by 4, pause, next 4, pau
 
 Here is [the code](dev/show.clj) behind the show
 
-## Tweaking the knobs
-
-#### Queue size
-
-The default queue that is backing lasync's pool is `ArrayLimitedQueue` with a default capacity of `1024` items. But all defaults are there to customize.
-A queue size is what limits the pool enabling the back pressure. Use `:limit` to tune that knob:
-
-```clojure
-(def pool (lasync/pool :limit 65535))
-```
+## Tweaking other knobs
 
 #### Queue implementation
 
