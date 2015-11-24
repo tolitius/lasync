@@ -7,23 +7,22 @@
 (defonce available-cores 
   (.. Runtime getRuntime availableProcessors))
 
-(defn- default-num-threads []
-  (* 2 available-cores))
+(defn- number-of-threads []
+  (+ (* 2 available-cores) 42))
 
-(defn thread-exception-handler []
+(defn- uncaught-exception-handler []
   (reify Thread$UncaughtExceptionHandler
     (uncaughtException [_ thread throwable]
       (throw (RuntimeException. (str "problem detected in thread: [" (.getName thread) "]") throwable)))))
 
-(defn- rejected-exec-handler
-  ([]
+(defn default-rejected-fn [runnable _]
+  (throw (RejectedExecutionException. 
+           (str "rejected execution: " runnable))))
+
+(defn- rejected-handler [f]
    (reify RejectedExecutionHandler
      (rejectedExecution [_ runnable executor]
-       (throw (RejectedExecutionException. (str "rejected execution: " runnable))))))
-  ([f]
-   (reify RejectedExecutionHandler
-     (rejectedExecution [_ runnable executor]
-       (f runnable executor)))))
+       (f runnable executor))))
 
 (defn- thread-factory [name]
   (let [counter (AtomicInteger.)]
@@ -32,17 +31,18 @@
         (let [t (Thread. runnable)]
           (doto t
             (.setName (str name "-" (.incrementAndGet counter)))
-            (.setDaemon true)))))))
+            (.setDaemon true)
+            (.setUncaughtExceptionHandler (uncaught-exception-handler))))))))
 
-(defn pool [& {:keys [threads limit thread-factory rejected-handler queue]
-               :or {threads (default-num-threads)
+(defn pool [& {:keys [threads limit thread-factory rejected-fn queue]
+               :or {threads (number-of-threads)
                     limit 1024
-                    rejected-handler (rejected-exec-handler)
+                    rejected-fn default-rejected-fn
                     thread-factory (thread-factory "lasync-thread")}}]
 
   (let [queue (or queue (ArrayLimitedQueue. limit))]
     (ThreadPoolExecutor. threads threads 1 TimeUnit/MILLISECONDS
-                         queue thread-factory rejected-handler)))
+                         queue thread-factory (rejected-handler rejected-fn))))
 
 (defn submit [pool f]
   (.submit pool f))

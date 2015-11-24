@@ -49,11 +49,11 @@ show=> (lasync/submit pool #(+ 41 1))
 #object[java.util.concurrent.FutureTask 0x6d1ce6d3 "java.util.concurrent.FutureTask@6d1ce6d3"]
 ```
 
-
-By default lasync will create a number of threads and a blocking queue limit that doubles the number of available cores:
+By default lasync will create `available cores * 2 + 42` number of threads:
 
 ```clojure
-(* 2 available-cores)
+(defn- number-of-threads []
+  (+ (* 2 available-cores) 42))
 ```
 
 But the number can be changed by:
@@ -145,15 +145,21 @@ of reify'ing an interface.
 
 #### Rejected execution handler
 
-Custom 'RejectedExecutionHandler' is equally as simple
+lasync takes an optional `rejected-fn` that will be called on every `RejectedExecutionException`. The default function is:
 
 ```clojure
+(defn default-rejected-fn [runnable _]
+  (throw (RejectedExecutionException. 
+           (str "rejected execution: " runnable))))
+```
 
-(def reh (reify 
-           RejectedExecutionHandler
-           (rejectedExecution [_ runnable executor] ...)))
+but it can be replaced with a custom one (the second param is an `executor`, it is ignored in this case):
 
-(def pool (lasync/pool :threads 10 :rejected-handler reh))
+```clojure
+(defn log-rejected [runnable _]
+  (error runnable "was rejected"))
+
+(def pool (lasync/pool :threads 10 :rejected-fn log-rejected))
 ```
 
 #### UnDefault It
@@ -162,13 +168,13 @@ Custom 'RejectedExecutionHandler' is equally as simple
 (def tpool (reify ThreadFactory
                  (newThread [_ runnable] ...)))
 
-(def reh (reify RejectedExecutionHandler
-             (rejectedExecution [_ runnable executor] ...)))
+(defn log-rejected [runnable _]
+  (error runnable "was rejected"))
 
 (def lp (lasync/pool :threads 42 
                      :thread-factory tpool 
                      :limit 101010101 
-                     :rejected-handler reh))
+                     :rejected-fn log-rejected))
 ```
 
 ## License

@@ -3,7 +3,7 @@
             [clojure.tools.logging :refer [info]])
   (:import [lasync.limitq ArrayLimitedQueue LinkedLimitedQueue]))
 
-(defonce pool (lasync/pool :queue (ArrayLimitedQueue. 42)))
+(defonce pool (lasync/pool :queue (ArrayLimitedQueue. 4)))
 
 (defn qsize [pool]
   (.. pool getQueue size))
