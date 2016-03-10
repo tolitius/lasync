@@ -13,7 +13,7 @@
 (defn- uncaught-exception-handler []
   (reify Thread$UncaughtExceptionHandler
     (uncaughtException [_ thread throwable]
-      (throw (RuntimeException. (str "problem detected in thread: [" (.getName thread) "]") throwable)))))
+      (prn (str "problem detected in thread: [" (.getName thread) "]") throwable))))
 
 (defn default-rejected-fn [runnable _]
   (throw (RejectedExecutionException. 
