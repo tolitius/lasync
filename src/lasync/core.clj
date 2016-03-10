@@ -46,3 +46,6 @@
 
 (defn submit [pool f]
   (.submit pool f))
+
+(defn execute [pool f]
+  (.execute pool f))

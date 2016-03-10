@@ -2,7 +2,7 @@
 
 An executor service (a.k.a. smart pool of threads) that is backed by a [ArrayLimitedQueue](src/java/lasync/limitq/ArrayLimitedQueue.java) or [LinkedLimitedQueue](src/java/lasync/limitq/LinkedLimitedQueue.java).
 
-The purpose of this tiny library is to be able to block on ".submit" whenever the q task limit is reached. Here is why..
+The purpose of this tiny library is to be able to block on ".submit" / ".execute" whenever the q task limit is reached. Here is why..
 
 ## Why
 
@@ -48,6 +48,8 @@ there is also a `submit` function that wraps this call and returns a future:
 show=> (lasync/submit pool #(+ 41 1))
 #object[java.util.concurrent.FutureTask 0x6d1ce6d3 "java.util.concurrent.FutureTask@6d1ce6d3"]
 ```
+
+as well as an `execute` function that _does not return a future_, hence exeptions will be caught and reported by the default exception handler.
 
 ### Number of threads
 

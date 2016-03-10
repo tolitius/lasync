@@ -16,13 +16,13 @@
 (deftest queue-test
   (testing "check queue injection"
     (let [capacity 11
-          pool (pool :threads 1 :queue (LinkedLimitedQueue. capacity))]
+          pool (lasync/pool :threads 1 :queue (LinkedLimitedQueue. capacity))]
       (is (instance? LinkedLimitedQueue (.getQueue pool)))
       (is (= capacity (.remainingCapacity (.getQueue pool)))))))
 
 (deftest queue-array-test
   (testing "check array blocking queue"
     (let [capacity 11
-          pool (pool :threads 1 :queue (ArrayLimitedQueue. capacity))]
+          pool (lasync/pool :threads 1 :queue (ArrayLimitedQueue. capacity))]
       (is (instance? ArrayLimitedQueue (.getQueue pool)))
       (is (= capacity (.remainingCapacity (.getQueue pool)))))))
