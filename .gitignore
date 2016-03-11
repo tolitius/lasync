@@ -13,3 +13,4 @@ nohup.out
 *.iml
 .lein-repl*
 .nrepl-port
+pom.xml*
