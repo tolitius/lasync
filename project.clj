@@ -15,4 +15,4 @@
                    :dependencies [[ch.qos.logback/logback-classic "1.1.3"]
                                   [org.clojure/tools.logging "0.3.1"]]}}
 
-  :dependencies [[org.clojure/clojure "1.7.0"]])
+  :dependencies [[org.clojure/clojure "1.8.0"]])
