@@ -45,7 +45,10 @@
                          queue thread-factory (rejected-handler rejected-fn))))
 
 (defn submit [pool f]
-  (.submit pool f))
+  (let [task (reify Callable
+               (call [_]
+                 (f)))]
+    (.submit pool task)))
 
 (defn execute [pool f]
   (.execute pool f))
