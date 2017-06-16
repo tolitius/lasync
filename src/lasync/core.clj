@@ -52,3 +52,10 @@
 
 (defn execute [pool f]
   (.execute pool f))
+
+(defn fork-cat [pool fs]
+  "a.k.a. 🔱 🐱 "
+  (->> fs
+       (map #(submit pool %))
+       (map #(.get %))
+       doall))
