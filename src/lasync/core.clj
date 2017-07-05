@@ -24,7 +24,7 @@
      (rejectedExecution [_ runnable executor]
        (f runnable executor))))
 
-(defn- thread-factory [name]
+(defn thread-factory [name]
   (let [counter (AtomicInteger.)]
     (reify ThreadFactory
       (newThread [_ runnable]
