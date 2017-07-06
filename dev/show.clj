@@ -3,8 +3,6 @@
             [clojure.tools.logging :as log])
   (:import [lasync.limitq ArrayLimitedQueue LinkedLimitedQueue]))
 
-(defonce pool (lasync/pool :queue (ArrayLimitedQueue. 4)))
-
 (defn qsize [pool]
   (.. pool getQueue size))
 
@@ -12,7 +10,14 @@
   (log/info "pool q-size: " (qsize pool) ", submitted: " submitted)
   (Thread/sleep 1000))
 
-(defn rock-on [ntasks]
-  (map (fn [n]
-         (lasync/submit pool #(stats pool n)))
-       (range ntasks)))
+(defn rock-on
+  ([ntasks]
+   (rock-on ntasks {}))
+  ([ntasks {:keys [threads q-size]
+            :or {threads 4
+                 q-size 4}}]
+   (let [pool (lasync/pool :threads threads
+                           :queue (ArrayLimitedQueue. q-size))]
+     (map (fn [n]
+            (lasync/submit pool #(stats pool n)))
+          (range ntasks)))))
