@@ -1,6 +1,6 @@
 (ns show
   (:require [lasync.core :as lasync]
-            [clojure.tools.logging :refer [info]])
+            [clojure.tools.logging :as log])
   (:import [lasync.limitq ArrayLimitedQueue LinkedLimitedQueue]))
 
 (defonce pool (lasync/pool :queue (ArrayLimitedQueue. 4)))
@@ -9,7 +9,7 @@
   (.. pool getQueue size))
 
 (defn stats [pool submitted]
-  (info "pool q-size: " (qsize pool) ", submitted: " submitted)
+  (log/info "pool q-size: " (qsize pool) ", submitted: " submitted)
   (Thread/sleep 1000))
 
 (defn rock-on [ntasks]

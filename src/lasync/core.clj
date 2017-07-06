@@ -34,15 +34,19 @@
             (.setDaemon true)
             (.setUncaughtExceptionHandler (uncaught-exception-handler))))))))
 
-(defn pool [& {:keys [threads limit thread-factory rejected-fn queue]
+(defn pool [& {:keys [threads limit thread-factory keep-alive-ms rejected-fn queue]
                :or {threads (number-of-threads)
+                    keep-alive-ms 60000
                     limit 1024
                     rejected-fn default-rejected-fn
                     thread-factory (thread-factory "lasync-thread")}}]
 
   (let [queue (or queue (ArrayLimitedQueue. limit))]
-    (ThreadPoolExecutor. threads threads 1 TimeUnit/MILLISECONDS
-                         queue thread-factory (rejected-handler rejected-fn))))
+    (ThreadPoolExecutor. threads threads
+                         keep-alive-ms TimeUnit/MILLISECONDS
+                         queue
+                         thread-factory
+                         (rejected-handler rejected-fn))))
 
 (defn submit [pool f]
   (let [task (reify Callable
