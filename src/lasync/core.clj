@@ -4,7 +4,7 @@
                                  RejectedExecutionException RejectedExecutionHandler]
            [java.util.concurrent.atomic AtomicInteger]))
 
-(defonce available-cores 
+(defonce available-cores
   (.. Runtime getRuntime availableProcessors))
 
 (defn- number-of-threads []
@@ -16,7 +16,7 @@
       (prn (str "problem detected in thread: [" (.getName thread) "]") throwable))))
 
 (defn default-rejected-fn [runnable _]
-  (throw (RejectedExecutionException. 
+  (throw (RejectedExecutionException.
            (str "rejected execution: " runnable))))
 
 (defn- rejected-handler [f]
@@ -34,12 +34,13 @@
             (.setDaemon true)
             (.setUncaughtExceptionHandler (uncaught-exception-handler))))))))
 
-(defn pool [& {:keys [threads limit thread-factory keep-alive-ms rejected-fn queue]
+(defn pool [& {:keys [threads name limit thread-factory keep-alive-ms rejected-fn queue]
                :or {threads (number-of-threads)
+                    name "lasync-thread"
                     keep-alive-ms 60000
                     limit 1024
                     rejected-fn default-rejected-fn
-                    thread-factory (thread-factory "lasync-thread")}}]
+                    thread-factory (thread-factory name)}}]
 
   (let [queue (or queue (ArrayLimitedQueue. limit))]
     (ThreadPoolExecutor. threads threads

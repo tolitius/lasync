@@ -1,11 +1,11 @@
-(defproject lasync "0.1.11"
+(defproject tolitius/lasync "0.1.12"
   :description "executor service that blocks on .submit after the task queue limit is reached"
   :url "https://github.com/tolitius/lasync"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :source-paths ["src"]
-  :java-source-paths ["src/java"]          
+  :java-source-paths ["src/java"]
 
   :scm {:name "git"
         :url "https://github.com/tolitius/lasync"}
