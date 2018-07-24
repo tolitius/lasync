@@ -50,7 +50,10 @@
                          (rejected-handler rejected-fn))))
 
 (defn submit [pool f]
-  (let [task (reify Callable
+  (let [f (if (fn? f)          ;; if f is not fn, wrap it in one
+            f
+            (fn [] f))
+        task (reify Callable
                (call [_]
                  (f)))]
     (.submit pool task)))
