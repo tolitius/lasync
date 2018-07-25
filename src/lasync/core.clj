@@ -64,6 +64,5 @@
 (defn fork-cat [pool fs]
   "a.k.a. 🔱 🐱 "
   (->> fs
-       (map #(submit pool %))
-       (map #(.get %))
-       doall))
+       (mapv #(submit pool %))
+       (mapv #(.get %))))
