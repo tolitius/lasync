@@ -23,7 +23,7 @@ Another good use is described in ["Creating a NotifyingBlockingThreadPoolExecuto
 
 To get lasync with Leiningen:
 
-[![Clojars Project](http://clojars.org/lasync/latest-version.svg)](http://clojars.org/lasync)
+[![Clojars Project](http://clojars.org/tolitius/lasync/latest-version.svg)](http://clojars.org/tolitius/lasync)
 
 ### Use it
 
