@@ -61,6 +61,9 @@
 (defn execute [pool f]
   (.execute pool f))
 
+(defn shutdown [pool]
+  (.shutdownNow pool))
+
 (defn fork-cat [pool fs]
   "a.k.a. 🔱 🐱 "
   (->> fs

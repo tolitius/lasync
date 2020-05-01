@@ -1,19 +1,34 @@
 # Limited Async
 
+- [Why](#why)
+- [How To](#how-to)
+  - [Get it](#get-it)
+  - [Use it](#use-it)
+  - [Number of threads](#number-of-threads)
+  - [Queue size](#queue-size)
+- [Show Me](#show-me)
+- [Tweaking other knobs](#tweaking-other-knobs)
+    - [Queue implementation](#queue-implementation)
+    - [Thread factory](#thread-factory)
+    - [Rejected execution handler](#rejected-execution-handler)
+    - [UnDefault It](#undefault-it)
+  - [shut it down](#shut-it-down)
+- [License](#license)
+
 An executor service (a.k.a. smart pool of threads) that is backed by a [ArrayLimitedQueue](src/java/lasync/limitq/ArrayLimitedQueue.java) or [LinkedLimitedQueue](src/java/lasync/limitq/LinkedLimitedQueue.java).
 
 The purpose of this tiny library is to be able to block on ".submit" / ".execute" whenever the q task limit is reached. Here is why..
 
 ## Why
 
-If a regular [BlockingQueue](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html) is used, 
+If a regular [BlockingQueue](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html) is used,
 a ThreadPoolExecutor calls queue's "[offer](http://docs.oracle.com/javase/7/docs/api/java/util/concurrent/BlockingQueue.html#offer\(E\))"
 method which does not block: inserts a task and returns true, or returns false in case a queue is "capacity-restricted" and its capacity was reached.
 
-While this behavior is useful, there are cases where we do need to _block_ and wait until a ThreadPoolExecutor has 
+While this behavior is useful, there are cases where we do need to _block_ and wait until a ThreadPoolExecutor has
 a thread available to work on the task.
 
-Depending on a use case this back pressure can be very useful. One reason could be an off heap storage that is being read and processed 
+Depending on a use case this back pressure can be very useful. One reason could be an off heap storage that is being read and processed
 by a ThreadPoolExecutor: e.g. there is no need, and sometimes completely undesired, to use JVM heap for something that is already available off heap.
 Another good use is described in ["Creating a NotifyingBlockingThreadPoolExecutor"](https://today.java.net/pub/a/today/2008/10/23/creating-a-notifying-blocking-thread-pool-executor.html).
 
@@ -114,8 +129,8 @@ INFO: pool q-size: 0, submitted: 68
 ```
 
 Here lasync show was rocking on 4 core box (which it picked up on), so regardless of how many tasks are being pushed to it,
-the queue max size always stays at 4, and lasync creates that back pressure in case the task q limit is reached. 
-In fact the "blocking" can be seen in action, as each task is sleeping for a second, 
+the queue max size always stays at 4, and lasync creates that back pressure in case the task q limit is reached.
+In fact the "blocking" can be seen in action, as each task is sleeping for a second,
 so the whole thing can be visually seen being processed by 4, pause, next 4, pause, etc..
 
 Here is [the code](dev/show.clj) behind the show
@@ -136,7 +151,7 @@ By default lasync's thread factory tries to have reasonable defaults but if you 
 of reify'ing an interface.
 
 ```clojure
-(def tpool (reify 
+(def tpool (reify
              ThreadFactory
              (newThread [_ runnable] ...)))
 
@@ -149,7 +164,7 @@ lasync takes an optional `rejected-fn` that will be called on every `RejectedExe
 
 ```clojure
 (defn default-rejected-fn [runnable _]
-  (throw (RejectedExecutionException. 
+  (throw (RejectedExecutionException.
            (str "rejected execution: " runnable))))
 ```
 
@@ -171,14 +186,22 @@ but it can be replaced with a custom one (the second param is an `executor`, it 
 (defn log-rejected [runnable _]
   (error runnable "was rejected"))
 
-(def lp (lasync/pool :threads 42 
-                     :thread-factory tpool 
-                     :limit 101010101 
+(def lp (lasync/pool :threads 42
+                     :thread-factory tpool
+                     :limit 101010101
                      :rejected-fn log-rejected))
+```
+
+### shut it down
+
+when you done with a pool it is a good idea to shut it down:
+
+```clojure
+(lasync/shutdown pool)
 ```
 
 ## License
 
-Copyright © 2013 tolitius
+Copyright © 2020 tolitius
 
 Distributed under the Eclipse Public License, the same as Clojure.

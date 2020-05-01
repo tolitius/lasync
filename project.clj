@@ -1,4 +1,4 @@
-(defproject tolitius/lasync "0.1.15"
+(defproject tolitius/lasync "0.1.16"
   :description "executor service that blocks on .submit after the task queue limit is reached"
   :url "https://github.com/tolitius/lasync"
   :license {:name "Eclipse Public License"
