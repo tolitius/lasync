@@ -71,7 +71,7 @@ by default lasync will create `available cores * 2 + 42` number of threads:
 but the number can be changed by:
 
 ```clojure
-user=> (def pool (lasync/pool :threads 42))
+user=> (def pool (lasync/pool {:threads 42}))
 #'user/pool
 ```
 
@@ -81,7 +81,7 @@ the default queue that is backing lasync's pool is `ArrayLimitedQueue` with a de
 A queue size is what limits the pool _enabling the back pressure_. Use `:limit` to tune that knob:
 
 ```clojure
-(def pool (lasync/pool :limit 65535))
+(def pool (lasync/pool {:limit 65535}))
 ```
 
 ## show me
@@ -135,7 +135,7 @@ here is [the code](dev/show.clj) behind the show
 while `ArrayLimitedQueue` fits most of the use cases, a custom, or a different queue can be configured via `:queue`:
 
 ```clojure
-(def pool (lasync/pool :queue (LinkedLimitedQueue. 128)))
+(def pool (lasync/pool {:queue (LinkedLimitedQueue. 128)}))
 ```
 
 #### thread factory
@@ -148,7 +148,7 @@ of reify'ing an interface.
              ThreadFactory
              (newThread [_ runnable] ...)))
 
-(def pool (lasync/pool :threads 10 :thread-factory tpool))
+(def pool (lasync/pool {:threads 10 :thread-factory tpool}))
 ```
 
 #### rejected execution handler
@@ -167,7 +167,7 @@ but it can be replaced with a custom one (the second param is an `executor`, it 
 (defn log-rejected [runnable _]
   (error runnable "was rejected"))
 
-(def pool (lasync/pool :threads 10 :rejected-fn log-rejected))
+(def pool (lasync/pool {:threads 10 :rejected-fn log-rejected}))
 ```
 
 #### unDefault it
@@ -179,10 +179,10 @@ but it can be replaced with a custom one (the second param is an `executor`, it 
 (defn log-rejected [runnable _]
   (error runnable "was rejected"))
 
-(def lp (lasync/pool :threads 42
-                     :thread-factory tpool
-                     :limit 101010101
-                     :rejected-fn log-rejected))
+(def lp (lasync/pool {:threads 42
+                      :thread-factory tpool
+                      :limit 101010101
+                      :rejected-fn log-rejected}))
 ```
 
 ### shut it down
@@ -195,6 +195,6 @@ when you done with a pool it is a good idea to shut it down:
 
 ## license
 
-copyright © 2020 tolitius
+copyright © 2021 tolitius
 
 distributed under the Eclipse Public License, the same as Clojure.

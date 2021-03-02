@@ -34,13 +34,13 @@
             (.setDaemon true)
             (.setUncaughtExceptionHandler (uncaught-exception-handler))))))))
 
-(defn pool [& {:keys [threads name limit thread-factory keep-alive-ms rejected-fn queue]
-               :or {threads (number-of-threads)
-                    name "lasync-thread"
-                    keep-alive-ms 60000
-                    limit 1024
-                    rejected-fn default-rejected-fn
-                    thread-factory (thread-factory name)}}]
+(defn pool [{:keys [threads name limit thread-factory keep-alive-ms rejected-fn queue]
+             :or {threads (number-of-threads)
+                  name "lasync-thread"
+                  keep-alive-ms 60000
+                  limit 1024
+                  rejected-fn default-rejected-fn
+                  thread-factory (thread-factory name)}}]
 
   (let [queue (or queue (ArrayLimitedQueue. limit))]
     (ThreadPoolExecutor. threads threads
