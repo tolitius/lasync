@@ -6,7 +6,7 @@ an executor service (a.k.a. smart pool of threads) that is backed by an [ArrayLi
 [![<! clojars](https://img.shields.io/clojars/v/tolitius/lasync.svg)](https://clojars.org/tolitius/lasync)
 
 - [why](#why)
-- [how To](#how-to)
+- [how to](#how-to)
   - [number of threads](#number-of-threads)
   - [queue size](#queue-size)
   - [stats](#stats)
@@ -34,7 +34,7 @@ depending on a use case this back pressure can be very useful. One reason could 
 by a ThreadPoolExecutor: e.g. there is no need, and sometimes completely undesired, to use JVM heap for something that is already available off heap.
 Another good use is described in ["Creating a NotifyingBlockingThreadPoolExecutor"](https://web.archive.org/web/20130111220826/https://today.java.net/pub/a/today/2008/10/23/creating-a-notifying-blocking-thread-pool-executor.html).
 
-## how To
+## how to
 
 to create a pool with limited number of threads and a backing q limit:
 
