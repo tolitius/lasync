@@ -9,6 +9,7 @@ an executor service (a.k.a. smart pool of threads) that is backed by an [ArrayLi
 - [how To](#how-to)
   - [number of threads](#number-of-threads)
   - [queue size](#queue-size)
+  - [stats](#stats)
 - [show me](#show-me)
 - [tweaking other knobs](#tweaking-other-knobs)
     - [queue implementation](#queue-implementation)
@@ -82,6 +83,27 @@ A queue size is what limits the pool _enabling the back pressure_. Use `:limit` 
 
 ```clojure
 (def pool (lasync/pool {:limit 65535}))
+```
+
+### stats
+
+pool is no good when it is a black box. lasync let's you unbox those stats whenever you need it:
+
+```clojure
+user=> (lasync/stats pool)
+
+{:largestPoolSize 0,
+ :queueCurrentSize 0,
+ :activeCount 0,
+ :terminating false,
+ :poolSize 0,
+ :taskCount 0,
+ :completedTaskCount 0,
+ :class java.util.concurrent.ThreadPoolExecutor,
+ :terminated false,
+ :corePoolSize 66,
+ :maximumPoolSize 66,
+ :shutdown false}
 ```
 
 ## show me

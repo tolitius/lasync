@@ -34,7 +34,10 @@
             (.setDaemon true)
             (.setUncaughtExceptionHandler (uncaught-exception-handler))))))))
 
-(defn pool [{:keys [threads name limit thread-factory keep-alive-ms rejected-fn queue]
+(defn pool
+  ([]
+   (pool {}))
+  ([{:keys [threads name limit thread-factory keep-alive-ms rejected-fn queue]
              :or {threads (number-of-threads)
                   name "lasync-thread"
                   keep-alive-ms 60000
@@ -47,7 +50,15 @@
                          keep-alive-ms TimeUnit/MILLISECONDS
                          queue
                          thread-factory
-                         (rejected-handler rejected-fn))))
+                         (rejected-handler rejected-fn)))))
+
+(defn stats [pool]
+  (-> pool
+      bean
+      (dissoc :rejectedExecutionHandler
+              :threadFactory
+              :queue)
+      (assoc :queueCurrentSize (-> pool .getQueue .size))))
 
 (defn submit [pool f]
   (let [f (if (fn? f)          ;; if f is not fn, wrap it in one
