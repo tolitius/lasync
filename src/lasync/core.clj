@@ -58,7 +58,8 @@
       (dissoc :rejectedExecutionHandler
               :threadFactory
               :queue)
-      (assoc :queueCurrentSize (-> pool .getQueue .size))))
+      (assoc :queueCurrentSize (-> pool .getQueue .size)
+             :keepAliveTimeMs (.getKeepAliveTime pool TimeUnit/MILLISECONDS))))
 
 (defn submit [pool f]
   (let [f (if (fn? f)          ;; if f is not fn, wrap it in one

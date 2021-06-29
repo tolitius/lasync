@@ -101,6 +101,7 @@ user=> (lasync/stats pool)
  :completedTaskCount 0,
  :class java.util.concurrent.ThreadPoolExecutor,
  :terminated false,
+ :keepAliveTimeMs 60000,
  :corePoolSize 66,
  :maximumPoolSize 66,
  :shutdown false}
