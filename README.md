@@ -102,6 +102,7 @@ user=> (lasync/stats pool)
  :class java.util.concurrent.ThreadPoolExecutor,
  :terminated false,
  :keepAliveTimeMs 60000,
+ :allowsCoreThreadTimeOut false,
  :corePoolSize 66,
  :maximumPoolSize 66,
  :shutdown false}
@@ -150,6 +151,8 @@ In fact the "blocking" can be seen in action, as each task is sleeping for a sec
 so the whole thing can be visually seen being processed by 4, pause, next 4, pause, etc..
 
 here is [the code](dev/show.clj) behind the show
+
+do check out the `(expire-core-threads 69)` and `(use-max-threads 69)` from the examples as well
 
 ## tweaking other knobs
 

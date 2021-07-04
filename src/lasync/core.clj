@@ -37,20 +37,35 @@
 (defn pool
   ([]
    (pool {}))
-  ([{:keys [threads name limit thread-factory keep-alive-ms rejected-fn queue]
+  ([{:keys [threads
+            max-threads
+            name
+            limit
+            thread-factory
+            keep-alive-ms
+            allow-core-thread-timeout
+            rejected-fn
+            queue]
              :or {threads (number-of-threads)
                   name "lasync-thread"
                   keep-alive-ms 60000
+                  allow-core-thread-timeout false
                   limit 1024
                   rejected-fn default-rejected-fn
                   thread-factory (thread-factory name)}}]
 
-  (let [queue (or queue (ArrayLimitedQueue. limit))]
-    (ThreadPoolExecutor. threads threads
+  (let [queue (or queue (ArrayLimitedQueue. limit))
+        max-threads (or max-threads threads)]
+    (when (> threads max-threads)
+      (throw (RuntimeException. (str "core thread number (" threads
+                                     ") can't exceed max-threads (" max-threads ")"))))
+    (doto (ThreadPoolExecutor. threads
+                         max-threads
                          keep-alive-ms TimeUnit/MILLISECONDS
                          queue
                          thread-factory
-                         (rejected-handler rejected-fn)))))
+                         (rejected-handler rejected-fn))
+          (.allowCoreThreadTimeOut allow-core-thread-timeout)))))
 
 (defn stats [pool]
   (-> pool
@@ -59,7 +74,8 @@
               :threadFactory
               :queue)
       (assoc :queueCurrentSize (-> pool .getQueue .size)
-             :keepAliveTimeMs (.getKeepAliveTime pool TimeUnit/MILLISECONDS))))
+             :keepAliveTimeMs (.getKeepAliveTime pool TimeUnit/MILLISECONDS)
+             :allowsCoreThreadTimeOut (.allowsCoreThreadTimeOut pool))))
 
 (defn submit [pool f]
   (let [f (if (fn? f)          ;; if f is not fn, wrap it in one
