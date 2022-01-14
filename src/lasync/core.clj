@@ -91,8 +91,20 @@
 (defn execute [^ThreadPoolExecutor pool f]
   (.execute pool f))
 
-(defn shutdown [^ThreadPoolExecutor pool]
+(defn shutdown
+  "Request termination, waiting for current tasks to finish"
+  [^ThreadPoolExecutor pool]
+  (.shutdown pool))
+
+(defn shutdown!
+  "Request termination, NOT waiting for current tasks to finish"
+  [^ThreadPoolExecutor pool]
   (.shutdownNow pool))
+
+(defn await-termination
+  "Await for thread pool termination after `shutdown` was called"
+  [^ThreadPoolExecutor pool ^long ms]
+  (.awaitTermination pool ms TimeUnit/MILLISECONDS))
 
 (defn fork-cat
   "a.k.a. 🔱 🐱 "
