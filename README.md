@@ -219,6 +219,12 @@ when you done with a pool it is a good idea to shut it down:
 (lasync/shutdown pool)
 ```
 
+also wait for completion of tasks (timeout in ms):
+
+```clojure
+(lasync/await-termination pool 5000)
+```
+
 ## license
 
 copyright © 2021 tolitius
