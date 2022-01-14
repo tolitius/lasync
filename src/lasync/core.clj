@@ -1,8 +1,10 @@
 (ns lasync.core
   (:import [lasync.limitq ArrayLimitedQueue]
            [java.util.concurrent ThreadPoolExecutor TimeUnit ThreadFactory
-                                 RejectedExecutionException RejectedExecutionHandler]
+            RejectedExecutionException RejectedExecutionHandler Future]
            [java.util.concurrent.atomic AtomicInteger]))
+
+(set! *warn-on-reflection* true)
 
 (defonce available-cores
   (.. Runtime getRuntime availableProcessors))
@@ -34,7 +36,7 @@
             (.setDaemon true)
             (.setUncaughtExceptionHandler (uncaught-exception-handler))))))))
 
-(defn pool
+(defn ^ThreadPoolExecutor pool
   ([]
    (pool {}))
   ([{:keys [threads
@@ -67,7 +69,7 @@
                          (rejected-handler rejected-fn))
           (.allowCoreThreadTimeOut allow-core-thread-timeout)))))
 
-(defn stats [pool]
+(defn stats [^ThreadPoolExecutor pool]
   (-> pool
       bean
       (dissoc :rejectedExecutionHandler
@@ -77,7 +79,7 @@
              :keepAliveTimeMs (.getKeepAliveTime pool TimeUnit/MILLISECONDS)
              :allowsCoreThreadTimeOut (.allowsCoreThreadTimeOut pool))))
 
-(defn submit [pool f]
+(defn submit [^ThreadPoolExecutor pool f]
   (let [f (if (fn? f)          ;; if f is not fn, wrap it in one
             f
             (fn [] f))
@@ -86,14 +88,15 @@
                  (f)))]
     (.submit pool task)))
 
-(defn execute [pool f]
+(defn execute [^ThreadPoolExecutor pool f]
   (.execute pool f))
 
-(defn shutdown [pool]
+(defn shutdown [^ThreadPoolExecutor pool]
   (.shutdownNow pool))
 
-(defn fork-cat [pool fs]
+(defn fork-cat
   "a.k.a. 🔱 🐱 "
+  [pool fs]
   (->> fs
        (mapv #(submit pool %))
-       (mapv #(.get %))))
+       (mapv #(.get ^Future %))))
