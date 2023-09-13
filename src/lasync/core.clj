@@ -80,12 +80,14 @@
              :allowsCoreThreadTimeOut (.allowsCoreThreadTimeOut pool))))
 
 (defn submit [^ThreadPoolExecutor pool f]
-  (let [f (if (fn? f)          ;; if f is not fn, wrap it in one
-            f
-            (fn [] f))
-        task (reify Callable
-               (call [_]
-                 (f)))]
+  (let [f     (if (fn? f)          ;; if f is not fn, wrap it in one
+                f
+                (fn [] f))
+        frame (clojure.lang.Var/cloneThreadBindingFrame)
+        task  (reify Callable
+                (call [_]
+                  (clojure.lang.Var/resetThreadBindingFrame frame)
+                  (f)))]
     (.submit pool task)))
 
 (defn execute [^ThreadPoolExecutor pool f]
